@@ -33,6 +33,30 @@ app.get('/objects/:key', async (req, res) => {
   res.json(JSON.parse(data));
 });
 
+app.get('/objects', async (req, res) => {
+  const keys = await client.keys('*');
+  const object = {};
+  for (const key of keys) {
+    const value = await client.get(key);
+    object[key] = JSON.parse(value);
+  }
+
+  res.json(object);
+});
+
+app.delete('/objects/:key', async (req,res) => {
+  const key = req.params.key;
+  await client.del(key);
+  res.json({succes: true});
+});
+
+app.patch('/objects/:key', async (req,res) =>{
+  const key = req.params.key;
+  const newData = req.body;
+  await client.set(key, JSON.stringify(newData));
+  res.json({succes: true});
+});
+
 app.listen(port, () => {
   console.log("Server start")
 });
